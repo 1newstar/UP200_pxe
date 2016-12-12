@@ -1,10 +1,16 @@
 # 网络无人值守安装#
 
-### 1.网络无人值守安装的作用：###
+[TOC]
 
-常见的引导有开机引导和光驱引导以及U盘引导，但是在我们生产环境里不会一台一台装，都是希望使用之用批量安装的方式，解决的方案就是使用网络方式安装，实现批量化的操作。
 
-### 2.网络无人值守安装的流程简介：###
+
+## 网络无人值守安装的作用
+
+常见的Linux安装方式有光盘安装和U盘安装两种，如果我们有几十台甚至上百台服务器需要统一部署上架，不论是光盘安装还是U盘安装，在生产环境中都需要一台一台的逐个安装，即使你有足够多的光驱并刻录足够多的光盘，你也会发现这是一个既耗时又耗力的苦差事。因此，我们就希望于使用一种可以批量化部署的方案，以此解决减少部署时间和部署负责度的问题。这种方法就是网络无人值守安装方案。
+
+网络无人值守安装就是通过网络启动时推送启动或安装选项，通过匹配被安装服务器的网卡MAC地址段确认安装源和安装方式的一种技术集合，它不是一种技术而是多种技术组合完成的。
+
+## 网络无人值守安装的流程简介
 
 1）DHCP：用以分配ip地址
 
@@ -14,13 +20,13 @@
 
 4）kickstart文件：提供安装介质
 
-![](pxe/1.png)
+![PXE 通讯过程](pxe/1.png)
 
 
 
-### 3.DHCP的部署###
+## DHCP的部署
 
-#### 3.1  dhcp简介####
+### dhcp简介
 
 DHCP是DynamicHostConfigurationProtocol的缩写。
 
@@ -80,9 +86,9 @@ net.ipv4.ip_forward = 1
 [root@serverg ~]# mount 172.25.254.250:/content /mnt
 ```
 
-#### 3.2  dhcp配置####
+### 配置 DHCP
 
-1）装包
+1）安装软件包
 
 ```shell
 [root@serverg mnt]# yum -y install dhcp
@@ -125,7 +131,7 @@ Complete!
 
 ```
 
-2）dhcp的配置
+2）配置DHCP服务
 
 ```shell
 [root@serverg mnt]# cp /usr/share/doc/dhcp-4.2.5/dhcpd.conf.example /etc/dhcp/dhcpd.conf 
@@ -177,7 +183,7 @@ shared-network 224-29 {
 
 ```
 
-### 4.TFTP的配置###
+## 配置 TFTP
 
 PXE(Preboot Execution Environment)是由Intel设计的协议，它可以使计算机通过网络启动。协议分为客户端和服务器两端，PXE 客户端在网卡的ROM中，当计算机引导时BIOS把PXE客户端调入内存执行，并显示出命令菜单，经用户选择后，PXE客户端将放置在远端的操作系统通过网络下载到本地运行。PXE协议的成功运行需要解决以下两个问题：第一，IP由谁和如何分配分配;第二，客户端所需系统内核和其他文件从哪里得到。
 
@@ -218,7 +224,6 @@ label install
         menu label Install rhel7
         kernel vmlinuz　# 内核所在位置
         append initrd=initrd.img ks=http://192.168.0.16/myks.cfg # 指定initrd文件及后续kickstart文件所在位置
-
 ```
 
 3）相关文件放置到/var/lib/tftpboot
@@ -248,7 +253,7 @@ service tftp
 [root@serverg html]# systemctl restart xinetd
 ```
 
-### 5.kickstart文件的部署###
+## 部署Kickstart 文件
 
 1）编辑kickstart自动应答文件，该文件可以自己手动编辑也可通过图形化界面编辑
 
@@ -259,7 +264,7 @@ service tftp
 [root@workstation ~]# system-config-kickstart
 ```
 
-![](pxe/2.png)
+![Kickstart截图](pxe/2.png)
 
 也可以直接修改kickstart文件
 
